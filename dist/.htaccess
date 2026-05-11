@@ -1,0 +1,7 @@
+# SPA fallback for Apache (HostEurope and other cPanel/Apache hosts).
+# Any path that isn't a real file/folder gets rewritten to /index.html so
+# react-router-dom can handle the route on the client.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
