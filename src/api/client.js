@@ -50,6 +50,8 @@ export const api = {
   createProject: (projectName) =>
     request('/projects', { method: 'POST', body: { project_name: projectName } }),
   deleteProject: (id) => request('/projects/delete', { method: 'POST', body: { id } }),
+  renameProject: (id, projectName) =>
+    request('/projects/rename', { method: 'POST', body: { id, project_name: projectName } }),
   listSubmissions: (projectId) => request(`/submissions?project_id=${encodeURIComponent(projectId)}`),
 };
 

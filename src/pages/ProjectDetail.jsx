@@ -31,6 +31,21 @@ export default function ProjectDetail() {
     } catch { /* ignore — the table just keeps its old contents */ }
   }
 
+  async function handleRename() {
+    if (!project) return;
+    const next = prompt('Rename project to:', project.project_name);
+    if (next == null) return;
+    const trimmed = next.trim();
+    if (!trimmed || trimmed === project.project_name) return;
+    setErr('');
+    try {
+      const updated = await api.renameProject(project.id, trimmed);
+      setProject((prev) => (prev ? { ...prev, project_name: updated.project_name } : prev));
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -71,8 +86,11 @@ export default function ProjectDetail() {
       <div style={{ marginBottom: 8 }}>
         <Link to="/" className="muted">← All projects</Link>
       </div>
-      <h1>{project.project_name}</h1>
-      <p className="muted" style={{ marginTop: 0 }}>
+      <div className="row" style={{ alignItems: 'center', gap: 12 }}>
+        <h1 style={{ margin: 0 }}>{project.project_name}</h1>
+        <button className="btn btn-secondary" onClick={handleRename}>Rename</button>
+      </div>
+      <p className="muted" style={{ marginTop: 8 }}>
         Public token: <span className="token-chip">{project.project_token}</span>
       </p>
 

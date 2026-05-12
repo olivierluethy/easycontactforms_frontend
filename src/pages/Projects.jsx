@@ -53,6 +53,20 @@ export default function Projects() {
     }
   }
 
+  async function handleRename(p) {
+    const next = prompt(`Rename "${p.project_name}" to:`, p.project_name);
+    if (next == null) return;
+    const trimmed = next.trim();
+    if (!trimmed || trimmed === p.project_name) return;
+    setErr('');
+    try {
+      await api.renameProject(p.id, trimmed);
+      await load();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
   return (
     <>
       <h1>Projects</h1>
@@ -95,6 +109,7 @@ export default function Projects() {
               </div>
               <div className="row">
                 <Link to={`/projects/${p.id}`} className="btn btn-secondary">Open</Link>
+                <button className="btn btn-secondary" onClick={() => handleRename(p)}>Rename</button>
                 <button className="btn btn-danger" onClick={() => handleDelete(p)}>Delete</button>
               </div>
             </div>
