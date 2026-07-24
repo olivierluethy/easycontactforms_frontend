@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const widgetRoot = path.resolve(__dirname, '../widget');
+const widgetRoot = path.resolve(__dirname, '../easycontactforms_widget');
 
 export default defineConfig({
   plugins: [react()],
@@ -20,7 +20,15 @@ export default defineConfig({
   server: {
     port: 5173,
     // Vite's default fs.allow is just the project root; expand it to include
-    // the sibling widget/ directory so the alias above can be imported.
+    // the sibling easycontactforms_widget/ directory so the alias above can be
+    // imported.
     fs: { allow: [path.resolve(__dirname, '..')] },
+  },
+  test: {
+    // jsdom so component tests can render; pure util tests don't care either way.
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.js'],
+    include: ['src/**/*.test.{js,jsx}'],
   },
 });

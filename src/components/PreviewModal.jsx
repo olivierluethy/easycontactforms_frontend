@@ -1,52 +1,42 @@
-// Live preview modal for the contact form. Renders the real <ContactForm>
-// component (aliased to ../../widget/src in vite.config.js) so what you see
-// here is exactly what visitors to your landing page will see.
+// Live preview of one form.
 //
-// Submissions through this modal are real — they post to the same backend and
-// appear in the project's submissions table. The warning banner makes that
-// clear before users hit Send.
+// Renders the real <ContactForm> (aliased to the widget source in
+// vite.config.js), pointed at the same API the customer's site would use — so
+// this is a genuine end-to-end test of the wiring, not a mock-up.
+//
+// Submissions sent from here are real and land in the list behind the modal.
+// The warning says so before anyone presses Send.
 
-import { useEffect } from 'react';
 import { ContactForm } from '@easycontact/react';
 import { API_BASE } from '../api/client.js';
+import { useTheme } from '../theme/ThemeProvider.jsx';
+import Modal from './Modal.jsx';
 
-export default function PreviewModal({ projectToken, projectName, onClose, onSubmissionSuccess }) {
-  useEffect(() => {
-    function onKey(e) { if (e.key === 'Escape') onClose(); }
-    window.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [onClose]);
+export default function PreviewModal({ form, projectName, onClose, onSubmissionSuccess }) {
+  const { theme } = useTheme();
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div>
-            <h2 style={{ margin: 0 }}>Preview</h2>
-            <div className="muted">{projectName}</div>
-          </div>
-          <button className="btn btn-secondary" onClick={onClose} aria-label="Close preview">
-            Close
-          </button>
-        </div>
-
-        <div className="modal-warn">
-          This preview is live. Anything you send here lands in your submissions table — perfect for confirming the wiring works end-to-end.
-        </div>
-
-        <div className="modal-body">
-          <ContactForm
-            projectId={projectToken}
-            apiBase={API_BASE}
-            onSuccess={() => { if (onSubmissionSuccess) onSubmissionSuccess(); }}
-          />
-        </div>
+    <Modal title="Test snippet" subtitle={`${projectName} · ${form.form_name}`} onClose={onClose}>
+      <div
+        className="error-banner"
+        style={{
+          background: 'var(--unread-soft)',
+          borderColor: 'color-mix(in srgb, var(--unread) 34%, transparent)',
+          color: 'var(--unread-text)',
+        }}
+      >
+        This preview is live. Anything you send lands in your submissions — which is exactly how you confirm
+        the wiring works.
       </div>
-    </div>
+
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+        <ContactForm
+          formId={form.form_token}
+          apiBase={API_BASE}
+          theme={theme}
+          onSuccess={() => onSubmissionSuccess?.()}
+        />
+      </div>
+    </Modal>
   );
 }

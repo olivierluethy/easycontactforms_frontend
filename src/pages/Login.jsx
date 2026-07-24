@@ -27,40 +27,55 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-box card">
-      <h1>Sign in</h1>
-      <p className="muted" style={{ marginTop: 0 }}>Welcome back.</p>
-      {err && <div className="error">{err}</div>}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label className="label">Email</label>
-          <input
-            className="input"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label className="label">Password</label>
-          <input
-            className="input"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button className="btn" type="submit" disabled={busy}>
-          {busy ? 'Signing in…' : 'Sign in'}
-        </button>
-      </form>
-      <p className="muted" style={{ marginTop: 16 }}>
-        Don&apos;t have an account? <Link to="/register">Create one</Link>
-      </p>
-    </div>
+    <main className="auth-shell">
+      <div className="auth-box">
+        <h1>Sign in</h1>
+        <p className="muted" style={{ marginTop: 4, marginBottom: 20 }}>
+          Welcome back.
+        </p>
+
+        {err && <div className="error-banner">{err}</div>}
+
+        <form onSubmit={handleSubmit} className="stack">
+          <div className="field">
+            <label className="label" htmlFor="login-email">
+              Email
+            </label>
+            <input
+              id="login-email"
+              className="input"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="field">
+            <label className="label" htmlFor="login-password">
+              Password
+            </label>
+            <input
+              id="login-password"
+              className="input"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button className="btn" type="submit" disabled={busy}>
+            {busy ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+
+        <p className="muted" style={{ marginTop: 18, marginBottom: 0 }}>
+          Don&apos;t have an account? <Link to="/register">Create one</Link>
+        </p>
+      </div>
+    </main>
   );
 }

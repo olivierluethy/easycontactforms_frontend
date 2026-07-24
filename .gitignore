@@ -1,0 +1,6 @@
+# NOTE: dist/ is deliberately NOT ignored — the built bundle is committed and
+# deployed straight from this repo.
+
+node_modules/
+.env.local
+*.local
