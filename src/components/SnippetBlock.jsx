@@ -1,26 +1,19 @@
-// Dark code block with an absolute-positioned Copy button. Used on
-// ProjectDetail to render the integration snippets the user copies into
-// their landing pages.
+// Dark code block with a Copy button. Used for the integration snippets.
 
-import { useState } from 'react';
+import { useCopy } from '../hooks/useCopy.js';
 
 export default function SnippetBlock({ code }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  }
+  const { copy, copied, failed } = useCopy();
 
   return (
     <pre className="snippet">
-      <button type="button" className="snippet-copy" onClick={handleCopy}>
-        {copied ? 'Copied!' : 'Copy'}
+      <button
+        type="button"
+        className={`snippet-copy${copied ? ' copied' : ''}`}
+        onClick={() => copy(code)}
+        aria-label="Copy snippet"
+      >
+        {copied ? '✓ Copied' : failed ? 'Press ⌘C' : 'Copy'}
       </button>
       <code>{code}</code>
     </pre>
