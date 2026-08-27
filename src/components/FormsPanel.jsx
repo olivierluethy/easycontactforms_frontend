@@ -69,6 +69,7 @@ function NewFormModal({ projectId, onClose, onCreated }) {
 
 export default function FormsPanel({ projectId, forms, selectedForm, onSelectForm, onFormsChanged }) {
   const [editing, setEditing] = useState(false);
+  const [multiEditing, setMultiEditing] = useState(false);
   const [creating, setCreating] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [error, setError] = useState('');
@@ -76,6 +77,12 @@ export default function FormsPanel({ projectId, forms, selectedForm, onSelectFor
   async function handleSave(changes) {
     await api.updateForm(selectedForm.id, changes);
     setEditing(false);
+    await onFormsChanged();
+  }
+
+  // Save one form's fields in the "Edit all" side-by-side view (issue #1).
+  async function handleSaveOne(formId, changes) {
+    await api.updateForm(formId, changes);
     await onFormsChanged();
   }
 
@@ -94,15 +101,56 @@ export default function FormsPanel({ projectId, forms, selectedForm, onSelectFor
     <section className="panel">
       <div className="panel-head">
         <h2>Forms</h2>
-        <button type="button" className="btn btn-secondary btn-sm" onClick={() => setCreating(true)}>
-          New form
-        </button>
+        <div className="row">
+          {forms.length > 1 && !multiEditing && (
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setEditing(false);
+                setMultiEditing(true);
+              }}
+            >
+              Edit all
+            </button>
+          )}
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => setCreating(true)}>
+            New form
+          </button>
+        </div>
       </div>
 
       <div className="panel-body">
         {error && <div className="error-banner">{error}</div>}
 
-        {editing && selectedForm ? (
+        {multiEditing ? (
+          <div className="stack">
+            <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+              <span className="eyebrow">Editing every form — each one saves on its own</span>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setMultiEditing(false)}>
+                Done
+              </button>
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gap: '16px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              }}
+            >
+              {forms.map((form) => (
+                <div key={form.id} className="panel" style={{ padding: '12px' }}>
+                  <h3 style={{ marginTop: 0 }}>{form.form_name}</h3>
+                  <FormBuilder
+                    form={form}
+                    onSave={(changes) => handleSaveOne(form.id, changes)}
+                    onCancel={() => setMultiEditing(false)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : editing && selectedForm ? (
           <FormBuilder form={selectedForm} onSave={handleSave} onCancel={() => setEditing(false)} />
         ) : (
           <div className="stack">
